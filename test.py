@@ -3,7 +3,6 @@ import re
 import random
 import tensorflow as tf
 import numpy as np
-from tensorflow.keras import layers
 from tensorflow.keras.models import load_model
 
 file_name = "./testing/espicula/Esp¡culaOnda_PacC3_F4-Pz_000343_2048_148ms.pdr"
