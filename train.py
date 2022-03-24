@@ -41,20 +41,7 @@ def crawl_folder(folder):
       1 if class_index == 3 else 0,
     ]
     final_y = np.array(y).astype(np.float32).reshape(4,)
-    # print(x_scaled.shape)
     yield (x_scaled, final_y)
-
-# iter = crawl_folder(b'training')
-# print(next(iter)[0].shape)
-# print(next(iter)[1].shape)
-# print(next(iter))
-# print(next(iter))
-# next(iter)
-# next(iter)
-# next(iter)
-# next(iter)
-# next(iter)
-# next(iter)
 
 train_dataset = tf.data.Dataset.from_generator(
   crawl_folder,
@@ -67,7 +54,6 @@ train_dataset = tf.data.Dataset.from_generator(
       dtype=tf.int8
     ),
   ),
-  # output_types=(tf.float32, tf.float32)
 )
 validation_dataset = tf.data.Dataset.from_generator(
   crawl_folder,
@@ -78,38 +64,20 @@ validation_dataset = tf.data.Dataset.from_generator(
   )
 )
 
-# # n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
-# # print(train_dataset.)
-
 model = tf.keras.Sequential([
-  # layers.Conv1D(filters=64, kernel_size=4, strides = 1, activation='relu', input_shape=(8,512,1)),
-  # layers.Conv1D(filters=64, kernel_size=4, strides = 1, activation='relu'),
-  # layers.MaxPool1D(pool_size=2, strides=1),
-  # layers.Flatten(),
-  # layers.Dense(100, activation='relu'),
-  # layers.Dense(4, activation = "softmax")
-
-
-
-  # layers.Flatten(input_shape=(8, 512, 1)),
-  # layers.Dense(128, activation='relu'),
-  # layers.Dense(4, activation='softmax')
-
-
-  # layers.Flatten(),
-  layers.InputLayer(input_shape=(1, 512)),
   layers.Dense(128, activation='relu'),  
   layers.Dense(256, activation='relu'),  
   layers.Dense(256, activation='relu'),  
   layers.Dense(4, activation='softmax') 
 ])
+
+batch_size = 1
+print(next(iter(train_dataset.batch(batch_size)))[0].shape)
+
 model.compile(loss = "categorical_crossentropy", optimizer = "adam", metrics = ["accuracy"])
-model.fit(train_dataset.batch(8), validation_data = validation_dataset.batch(8), epochs = 50)
+model.fit(train_dataset.batch(batch_size), validation_data = validation_dataset.batch(batch_size), epochs = 50)
 
-# for element in train_dataset:
-#   print(element)
+model.save('model/model.h5')
 
-# print(next(iter(train_dataset.batch(8))))
-
-# next(iter(train_dataset.batch(8))).shape
-
+_, acc = model.evaluate(validation_dataset.batch(batch_size), verbose=0)
+print('Precisão = %.2f%%' % (acc * 100.0))
