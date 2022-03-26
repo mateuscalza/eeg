@@ -72,8 +72,6 @@ model = tf.keras.Sequential([
 ])
 
 batch_size = 1
-print(next(iter(train_dataset.batch(batch_size)))[0].shape)
-
 model.compile(loss = "categorical_crossentropy", optimizer = "adam", metrics = ["accuracy"])
 model.fit(train_dataset.batch(batch_size), validation_data = validation_dataset.batch(batch_size), epochs = 50)
 

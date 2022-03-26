@@ -29,6 +29,8 @@ x_std = (initial_x - initial_x.min(axis=0)) / (initial_x.max(axis=0) - initial_x
 x_scaled = x_std * (max - min) + min
 x_test = np.array([x_scaled])
 
+print(x_test)
+
 model = load_model('./model/model.h5')
 result = model.predict(x_test)
 
