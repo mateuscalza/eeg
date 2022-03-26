@@ -95,12 +95,20 @@ export default function App() {
 
   const handleDraw = useCallback(
     (event) => {
+      console.log(event.nativeEvent)
       const xStep = canvasWidth / size
       const y = mapRange(event.nativeEvent.offsetY, canvasHeight, 0, 0, 1)
-      const x = parseInt(event.nativeEvent.offsetX / xStep, 10) - 1
+      const x = parseInt(
+        mapRange(event.nativeEvent.offsetX, 0, canvasWidth, 0, size),
+        10
+      )
+
+      if (x < 0 || x > size - 1) {
+        return
+      }
+
       const lastPoint = lastPointRef.current
       lastPointRef.current = { x, y }
-      console.log('set')
       setValues((oldValues) => {
         const newValues = oldValues
           ? Array.from(oldValues)
@@ -109,7 +117,6 @@ export default function App() {
         if (lastPoint.x !== null && lastPoint.y !== null) {
           const minX = Math.min(lastPoint.x, x)
           const maxX = Math.max(lastPoint.x, x)
-          console.log(minX, maxX)
           for (let subX = minX; subX <= maxX; subX++) {
             newValues[subX] = y
           }
@@ -134,6 +141,37 @@ export default function App() {
   const handleStopMoving = useCallback(() => {
     lastPointRef.current = { x: null, y: null }
   }, [])
+
+  useEffect(() => {
+    if (!canvasRef.current) {
+      return
+    }
+
+    const handleTouch = (event) => {
+      event.preventDefault()
+      const rect = event.target.getBoundingClientRect()
+      const offsetX = event.targetTouches[0].pageX - rect.left
+      const offsetY = event.targetTouches[0].pageY - rect.top
+      handleDraw({ nativeEvent: { offsetX, offsetY } })
+    }
+    const handleTouchEnd = (event) => {
+      event.preventDefault()
+      handleStopMoving({ nativeEvent: event })
+    }
+
+    canvasRef.current.addEventListener('touchstart', handleTouch, false)
+    canvasRef.current.addEventListener('touchmove', handleTouch, false)
+    canvasRef.current.addEventListener('touchend', handleTouchEnd, false)
+
+    return () => {
+      if (!canvasRef.current) {
+        return
+      }
+      canvasRef.current.removeEventListener('touchstart', handleTouch)
+      canvasRef.current.removeEventListener('touchmove', handleTouch)
+      canvasRef.current.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [canvasRef.current])
 
   if (modelResult.loading) {
     return <div className='app is-loading'>Carregando modelo...</div>
