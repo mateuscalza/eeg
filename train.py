@@ -86,7 +86,7 @@ model.compile(
     nesterov=False,
     name='SGD'
   ),
-  loss = "kullback_leibler_divergence",
+  loss = "categorical_crossentropy",
   metrics = ["accuracy"])
 model.fit(train_dataset.batch(batch_size),
   validation_data = validation_dataset.batch(batch_size),
