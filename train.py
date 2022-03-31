@@ -69,8 +69,8 @@ validation_dataset = tf.data.Dataset.from_generator(
 
 model = tf.keras.Sequential([
   layers.Dense(128, activation='relu'),
-  layers.Dense(256, activation='relu'),
-  layers.Dense(256, activation='relu'),
+  layers.Dense(1024, activation='relu'),
+  layers.Dense(64, activation='relu'),
   layers.Dense(4, activation='softmax')
 ])
 
@@ -88,7 +88,7 @@ model.compile(
   metrics = ["accuracy"])
 model.fit(train_dataset.batch(batch_size),
   validation_data = validation_dataset.batch(batch_size),
-  epochs = 50,
+  epochs = 100,
   callbacks = [tensorboard_callback]
 )
 
