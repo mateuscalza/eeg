@@ -54,7 +54,7 @@ train_dataset = tf.data.Dataset.from_generator(
       dtype=tf.float32
     ),
     tf.TensorSpec(shape=(4,),
-      dtype=tf.int8
+      dtype=tf.float32
     ),
   ),
 )
@@ -63,14 +63,16 @@ validation_dataset = tf.data.Dataset.from_generator(
   args = ['validation'], 
   output_signature=(
     tf.TensorSpec(shape=(512,), dtype=tf.float32),
-    tf.TensorSpec(shape=(4,), dtype=tf.int8),
+    tf.TensorSpec(shape=(4,), dtype=tf.float32),
   )
 )
 
 model = tf.keras.Sequential([
-  layers.Dense(128, activation='relu'),
   layers.Dense(1024, activation='relu'),
-  layers.Dense(64, activation='relu'),
+  layers.Dense(2048, activation='relu'),
+  layers.Dropout(0.5),
+  layers.Dense(2048, activation='relu'),
+  layers.Dense(128, activation='relu'),
   layers.Dense(4, activation='softmax')
 ])
 
