@@ -67,9 +67,9 @@ validation_dataset = tf.data.Dataset.from_generator(
 )
 
 model = tf.keras.Sequential([
-  layers.Dense(128, activation='relu'),
   layers.Dense(256, activation='relu'),
-  layers.Dense(256, activation='relu'),
+  layers.Dense(512, activation='relu'),
+  layers.Dense(512, activation='relu'),
   layers.Dense(4, activation='softmax')
 ])
 
