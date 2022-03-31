@@ -12,7 +12,7 @@ const canvasPadding = 40
 
 const colorScale = chroma.scale(['#aaa', 'rgb(52,152,219)']).mode('lrgb')
 
-export default function App() {
+export default function WebApp() {
   const modelResult = useAsync(() => tf.loadLayersModel('/model.json'), [])
   const [values, setValues] = useState(null)
   const [wrapperRef, { width, height }] = useMeasure()
@@ -97,7 +97,7 @@ export default function App() {
         yPadding + innerHeight * (1 - y)
       )
     }
-    context.lineWidth = 2
+    context.lineWidth = 3
     context.lineCap = 'round'
     context.strokeStyle = 'rgba(52,152,219,1.0)'
     context.stroke()
@@ -111,7 +111,7 @@ export default function App() {
         yPadding + innerHeight * (1 - y)
       )
     }
-    context.lineWidth = 8
+    context.lineWidth = 9
     context.lineCap = 'round'
     context.strokeStyle = 'rgba(52,152,219,0.3)'
     context.stroke()
@@ -151,6 +151,7 @@ export default function App() {
     },
     [canvasWidth, canvasHeight, lastPointRef.current]
   )
+
   const handleMouseMove = useCallback(
     (event) => {
       if (event.buttons !== 1) {
@@ -160,6 +161,7 @@ export default function App() {
     },
     [handleDraw]
   )
+
   const handleStopMoving = useCallback(() => {
     lastPointRef.current = { x: null, y: null }
   }, [])
@@ -245,13 +247,12 @@ export default function App() {
               color,
             }) => (
               <li key={key} title={title}>
-                <div>
-                  {label}: {formattedPercentage}
-                </div>
-                <span
+                <div
                   className='bar'
                   style={{ width: cssPercentage, backgroundColor: color }}
                 />
+                <span>{label}</span>
+                <small>{formattedPercentage}</small>
               </li>
             )
           )}

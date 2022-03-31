@@ -75,6 +75,9 @@ aside li .bar {
   margin: 0;
   border-radius: 10px;
 }
+aside li small {
+  color: #333;
+}
 canvas {
   position: absolute;
   background-color: #fff;
