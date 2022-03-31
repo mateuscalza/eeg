@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import * as tf from '@tensorflow/tfjs'
 import chroma from 'chroma-js'
+import { useDropzone } from 'react-dropzone'
 import { useAsync, useMeasure } from 'react-use'
 import mapRange from './utils/mapRange'
 
@@ -20,9 +21,8 @@ export default function WebApp() {
   const lastPointRef = useRef({ x: null, y: null })
   const model = modelResult.value
 
-  const handleFileChange = useCallback(
-    async (event) => {
-      const file = event.target.files[0]
+  const handleFile = useCallback(
+    async (file) => {
       if (!model || !file) {
         setValues(null)
         return
@@ -45,6 +45,20 @@ export default function WebApp() {
       setValues(normalized)
     },
     [model]
+  )
+
+  const { getRootProps, isDragActive } = useDropzone({
+    onDrop: ([file]) => handleFile(file),
+    noClick: true,
+    noKeyboard: true,
+  })
+
+  const handleFileChange = useCallback(
+    async (event) => {
+      const file = event.target.files[0]
+      handleFile(file)
+    },
+    [handleFile]
   )
 
   const predictionResult = useAsync(async () => {
@@ -214,7 +228,7 @@ export default function WebApp() {
   }
 
   return (
-    <div className='app'>
+    <div {...getRootProps()} className='app'>
       <main ref={wrapperRef}>
         <canvas
           ref={canvasRef}
