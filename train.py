@@ -82,8 +82,6 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_
 model.compile(
   optimizer = tf.keras.optimizers.SGD(
     learning_rate=0.001,
-    momentum=0.0,
-    nesterov=False,
     name='SGD'
   ),
   loss = "categorical_crossentropy",
