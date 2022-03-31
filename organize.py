@@ -20,7 +20,7 @@ for file in listdir(src_directory):
 	dst_dir = 'training/'
 	if random() < 0.05:
 		dst_dir = 'testing/'
-	elif random() < 0.3:
+	elif random() < 0.2:
 		dst_dir = 'validation/'
 
 	if file.startswith('Esp¡cula'):

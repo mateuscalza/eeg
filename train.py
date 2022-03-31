@@ -50,12 +50,8 @@ train_dataset = tf.data.Dataset.from_generator(
   crawl_folder,
   args = ['training'], 
   output_signature=(
-    tf.TensorSpec(shape=(512,),
-      dtype=tf.float32
-    ),
-    tf.TensorSpec(shape=(4,),
-      dtype=tf.int8
-    ),
+    tf.TensorSpec(shape=(512,), dtype=tf.float32),
+    tf.TensorSpec(shape=(4,), dtype=tf.float32),
   ),
 )
 validation_dataset = tf.data.Dataset.from_generator(
@@ -63,14 +59,14 @@ validation_dataset = tf.data.Dataset.from_generator(
   args = ['validation'], 
   output_signature=(
     tf.TensorSpec(shape=(512,), dtype=tf.float32),
-    tf.TensorSpec(shape=(4,), dtype=tf.int8),
+    tf.TensorSpec(shape=(4,), dtype=tf.float32),
   )
 )
 
 model = tf.keras.Sequential([
   layers.Dense(128, activation='relu'),
-  layers.Dense(256, activation='relu'),
-  layers.Dense(256, activation='relu'),
+  layers.Dense(1024, activation='relu'),
+  layers.Dense(64, activation='relu'),
   layers.Dense(4, activation='softmax')
 ])
 
@@ -79,6 +75,8 @@ batch_size = 1
 if os.path.exists("logs"):
   shutil.rmtree("./logs")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1)
+
+# Compile
 model.compile(
   optimizer = tf.keras.optimizers.SGD(
     learning_rate=0.001,
@@ -86,13 +84,21 @@ model.compile(
   ),
   loss = "categorical_crossentropy",
   metrics = ["accuracy"])
+
+# Fit
 model.fit(train_dataset.batch(batch_size),
   validation_data = validation_dataset.batch(batch_size),
-  epochs = 50,
+  epochs = 100,
   callbacks = [tensorboard_callback]
 )
 
+# Save model
 model.save('model/model.h5')
 
+# Evaluate from training
+_, acc = model.evaluate(train_dataset.batch(batch_size), verbose=0)
+print('Precisão (treinamento) = %.2f%%' % (acc * 100.0))
+
+# Evaluate from validation
 _, acc = model.evaluate(validation_dataset.batch(batch_size), verbose=0)
-print('Precisão = %.2f%%' % (acc * 100.0))
+print('Precisão (validação) = %.2f%%' % (acc * 100.0))
