@@ -74,7 +74,8 @@ model = tf.keras.Sequential([
 
 batch_size = 1
 
-os.rmdir("logs")
+if os.path.exists("logs"):
+  os.rmdir("logs")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1)
 model.compile(
   optimizer = tf.keras.optimizers.SGD(
