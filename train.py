@@ -13,6 +13,7 @@ file_lines_skip = 768
 
 classes_labels = ['espicula', 'normal', 'piscada', 'ruido']
 
+random.seed(1)
 def crawl_folder(folder):
   folder = folder.decode("utf-8")
   files = glob.glob("./" + folder + "/*/*")
@@ -43,13 +44,13 @@ def crawl_folder(folder):
       1 if class_index == 3 else 0,
     ]
     final_y = np.array(y).astype(np.float32).reshape(4,)
-    yield (x_scaled, final_y)
+    yield (np.tile(x_scaled.transpose(), (512, 1)), final_y)
 
 train_dataset = tf.data.Dataset.from_generator(
   crawl_folder,
   args = ['training'], 
   output_signature=(
-    tf.TensorSpec(shape=(512,),
+    tf.TensorSpec(shape=(512,512),
       dtype=tf.float32
     ),
     tf.TensorSpec(shape=(4,),
@@ -61,15 +62,26 @@ validation_dataset = tf.data.Dataset.from_generator(
   crawl_folder,
   args = ['validation'], 
   output_signature=(
-    tf.TensorSpec(shape=(512,), dtype=tf.float32),
+    tf.TensorSpec(shape=(512,512), dtype=tf.float32),
     tf.TensorSpec(shape=(4,), dtype=tf.int8),
   )
 )
 
 model = tf.keras.Sequential([
-  layers.Dense(512, activation='relu'),
-  layers.Dense(1024, activation='relu'),
-  layers.Dense(1024, activation='relu'),
+  # layers.Dense(128, activation='relu'),
+
+  # Conv
+  layers.Conv1D(64, 3, activation='relu'),
+  layers.MaxPooling1D(pool_size=2),
+  layers.Conv1D(128, 3, activation='relu'),
+  layers.MaxPooling1D(pool_size=2),
+  layers.Conv1D(256, 3, activation='relu'),
+  layers.MaxPooling1D(pool_size=2),
+  # layers.Dropout(0.5),
+  layers.Flatten(),
+
+  # Dense
+  layers.Dense(256, activation='relu'),
   layers.Dense(4, activation='softmax')
 ])
 
@@ -79,11 +91,13 @@ if os.path.exists("logs"):
   shutil.rmtree("./logs")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1)
 model.compile(
-  optimizer = tf.keras.optimizers.SGD(
+  optimizer = tf.keras.optimizers.Adam(
     learning_rate=0.01,
-    momentum=0.0,
-    nesterov=False,
-    name='SGD'
+    beta_1=0.9,
+    beta_2=0.999,
+    epsilon=1e-07,
+    amsgrad=False,
+    name='Adam',
   ),
   loss = "categorical_crossentropy",
   metrics = ["accuracy"])
