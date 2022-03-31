@@ -42,15 +42,43 @@ main {
   background-color: #ecf0f1;
 }
 aside {
+  display: flex;
   flex: 0 1 400px;
+  flex-direction: column;
   box-shadow: -5px 0 10px rgba(0,0,0,0.1);
   padding: 10px;
   background-color: #fff;
   z-index: 9;
+  justify-content: space-between;
+}
+aside form {
+  display: flex;
+}
+aside ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style-type: none;
+}
+aside li {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  width:100%;
+  margin: 15px 0 0;
+}
+aside li .bar {
+  height: 4px;
+  width: 100%;
+  background-color: #aaa;
+  margin: 0;
+  border-radius: 10px;
 }
 canvas {
   position: absolute;
   background-color: #fff;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.1);
 }
 
 @media (max-width: 600px) {

@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import * as tf from '@tensorflow/tfjs'
+import chroma from 'chroma-js'
 import { useAsync, useMeasure } from 'react-use'
 import mapRange from './utils/mapRange'
 
@@ -8,6 +9,8 @@ const fileLinesOffset = 5
 const fileLinesSkip = 768
 const labels = ['Espícula', 'Normal', 'Piscada', 'Ruído']
 const canvasPadding = 40
+
+const colorScale = chroma.scale(['#aaa', 'rgb(52,152,219)']).mode('lrgb')
 
 export default function App() {
   const modelResult = useAsync(() => tf.loadLayersModel('/model.json'), [])
@@ -59,7 +62,10 @@ export default function App() {
         formattedPercentage: `${(classPrediction * 100)
           .toFixed(3)
           .replace('.', ',')}%`,
+        title: `${String(classPrediction * 100).replace('.', ',')}%`,
+        cssPercentage: `${classPrediction * 100}%`,
         label: labels[classIndex],
+        color: colorScale(classPrediction).hex(),
       }))
       .sort((a, b) => b.prediction - a.prediction)
   }, [model, values])
@@ -80,13 +86,34 @@ export default function App() {
     }
     const xStep = canvasWidth / size
 
+    const yPadding = 5
+    const innerHeight = canvasHeight - yPadding * 2
+
     context.beginPath()
     for (let x = 0; x < values.length; x++) {
       const y = values[x]
-      context[x === 0 ? 'moveTo' : 'lineTo'](x * xStep, canvasHeight * (1 - y))
+      context[x === 0 ? 'moveTo' : 'lineTo'](
+        x * xStep,
+        yPadding + innerHeight * (1 - y)
+      )
     }
     context.lineWidth = 2
+    context.lineCap = 'round'
     context.strokeStyle = 'rgba(52,152,219,1.0)'
+    context.stroke()
+
+    // Second stroke
+    context.beginPath()
+    for (let x = 0; x < values.length; x++) {
+      const y = values[x]
+      context[x === 0 ? 'moveTo' : 'lineTo'](
+        x * xStep,
+        yPadding + innerHeight * (1 - y)
+      )
+    }
+    context.lineWidth = 8
+    context.lineCap = 'round'
+    context.strokeStyle = 'rgba(52,152,219,0.3)'
     context.stroke()
   }, [canvasRef, canvasWidth, canvasHeight, values])
 
@@ -204,12 +231,27 @@ export default function App() {
         />
       </main>
       <aside>
-        <input type='file' onChange={handleFileChange} />
+        <form>
+          <input type='file' onChange={handleFileChange} />
+        </form>
         <ul>
           {(predictionResult.value || []).map(
-            ({ key, label, formattedPercentage }) => (
-              <li key={key}>
-                {label}: {formattedPercentage}
+            ({
+              key,
+              label,
+              formattedPercentage,
+              cssPercentage,
+              title,
+              color,
+            }) => (
+              <li key={key} title={title}>
+                <div>
+                  {label}: {formattedPercentage}
+                </div>
+                <span
+                  className='bar'
+                  style={{ width: cssPercentage, backgroundColor: color }}
+                />
               </li>
             )
           )}
