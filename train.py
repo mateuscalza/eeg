@@ -1,6 +1,7 @@
 import glob
 import re
 import random
+import os
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras import layers
@@ -65,15 +66,30 @@ validation_dataset = tf.data.Dataset.from_generator(
 )
 
 model = tf.keras.Sequential([
-  layers.Dense(128, activation='relu'),  
-  layers.Dense(256, activation='relu'),  
-  layers.Dense(256, activation='relu'),  
-  layers.Dense(4, activation='softmax') 
+  layers.Dense(128, activation='relu'),
+  layers.Dense(256, activation='relu'),
+  layers.Dense(256, activation='relu'),
+  layers.Dense(4, activation='softmax')
 ])
 
 batch_size = 1
-model.compile(loss = "categorical_crossentropy", optimizer = "adam", metrics = ["accuracy"])
-model.fit(train_dataset.batch(batch_size), validation_data = validation_dataset.batch(batch_size), epochs = 50)
+
+os.rmdir("logs")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1)
+model.compile(
+  optimizer = tf.keras.optimizers.SGD(
+    learning_rate=0.001,
+    momentum=0.0,
+    nesterov=False,
+    name='SGD'
+  ),
+  loss = "categorical_crossentropy",
+  metrics = ["accuracy"])
+model.fit(train_dataset.batch(batch_size),
+  validation_data = validation_dataset.batch(batch_size),
+  epochs = 50,
+  callbacks = [tensorboard_callback]
+)
 
 model.save('model/model.h5')
 

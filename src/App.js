@@ -73,7 +73,6 @@ export default function App() {
     }
 
     const context = canvas.getContext('2d')
-    // console.log(0, 0, canvasWidth, canvasHeight)
     context.clearRect(0, 0, canvasWidth, canvasHeight)
 
     if (!values) {
@@ -91,12 +90,8 @@ export default function App() {
     context.stroke()
   }, [canvasRef, canvasWidth, canvasHeight, values])
 
-  // console.log('values', values)
-
   const handleDraw = useCallback(
     (event) => {
-      console.log(event.nativeEvent)
-      const xStep = canvasWidth / size
       const y = mapRange(event.nativeEvent.offsetY, canvasHeight, 0, 0, 1)
       const x = parseInt(
         mapRange(event.nativeEvent.offsetX, 0, canvasWidth, 0, size),
