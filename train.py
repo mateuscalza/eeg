@@ -1,6 +1,7 @@
 import glob
 import re
 import random
+import shutil
 import os
 import tensorflow as tf
 import numpy as np
@@ -75,11 +76,11 @@ model = tf.keras.Sequential([
 batch_size = 1
 
 if os.path.exists("logs"):
-  os.rmdir("logs")
+  shutil.rmtree("./logs")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1)
 model.compile(
   optimizer = tf.keras.optimizers.SGD(
-    learning_rate=0.001,
+    learning_rate=0.01,
     momentum=0.0,
     nesterov=False,
     name='SGD'
