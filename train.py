@@ -63,6 +63,10 @@ validation_dataset = tf.data.Dataset.from_generator(
   )
 )
 
+batch_size = 1
+if os.path.exists("logs"):
+  shutil.rmtree("./logs")
+
 model = tf.keras.Sequential([
   layers.Dense(128, activation='relu'),
   layers.Dense(1024, activation='relu'),
@@ -70,10 +74,6 @@ model = tf.keras.Sequential([
   layers.Dense(4, activation='softmax')
 ])
 
-batch_size = 1
-
-if os.path.exists("logs"):
-  shutil.rmtree("./logs")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1, profile_batch=0)
 
 # Compile
@@ -85,7 +85,7 @@ model.compile(
   loss = "categorical_crossentropy",
   metrics = ["accuracy"])
 
-# Fit
+# Train
 model.fit(train_dataset.batch(batch_size),
   validation_data = validation_dataset.batch(batch_size),
   epochs = 100,
