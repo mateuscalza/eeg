@@ -74,7 +74,7 @@ batch_size = 1
 
 if os.path.exists("logs"):
   shutil.rmtree("./logs")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1)
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1, profile_batch=0)
 
 # Compile
 model.compile(
